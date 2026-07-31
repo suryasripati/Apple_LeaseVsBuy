@@ -1,0 +1,12 @@
+[
+  {"category": "iPhone", "variant": "iPhone 17 Pro (256GB)", "mrp": 1099.0, "lease_12": 45.99, "buy_12": 91.58, "lease_24": 31.99, "buy_24": 45.79, "lease_36": null, "buy_36": 30.53},
+  {"category": "iPhone", "variant": "iPhone 17 Pro Max (256GB)", "mrp": 1199.0, "lease_12": 49.99, "buy_12": 99.92, "lease_24": 34.99, "buy_24": 49.96, "lease_36": null, "buy_36": 33.31},
+  {"category": "iPhone", "variant": "iPhone 17 (256GB)", "mrp": 799.0, "lease_12": 32.99, "buy_12": 66.58, "lease_24": 22.99, "buy_24": 33.29, "lease_36": null, "buy_36": 22.19},
+  {"category": "iPhone", "variant": "iPhone Air (256GB)", "mrp": 999.0, "lease_12": 41.99, "buy_12": 83.25, "lease_24": 28.99, "buy_24": 41.62, "lease_36": null, "buy_36": 27.75},
+  {"category": "Mac", "variant": "MacBook Air (256GB Base)", "mrp": 999.0, "lease_12": null, "buy_12": 83.25, "lease_24": 34.99, "buy_24": 41.62, "lease_36": 24.99, "buy_36": 27.75},
+  {"category": "Mac", "variant": "MacBook Pro (512GB Base)", "mrp": 1599.0, "lease_12": null, "buy_12": 133.25, "lease_24": 49.99, "buy_24": 66.62, "lease_36": 39.99, "buy_36": 44.42},
+  {"category": "iPad", "variant": "iPad Pro 11\" (256GB Base)", "mrp": 999.0, "lease_12": null, "buy_12": 83.25, "lease_24": 35.0, "buy_24": 41.62, "lease_36": 24.99, "buy_36": 27.75},
+  {"category": "iPad", "variant": "iPad Air 11\" (128GB Base)", "mrp": 599.0, "lease_12": null, "buy_12": 49.92, "lease_24": 22.99, "buy_24": 24.96, "lease_36": 15.99, "buy_36": 16.64},
+  {"category": "Apple Watch", "variant": "Series 11 Alum. 42mm (GPS)", "mrp": 399.0, "lease_12": 17.99, "buy_12": 33.25, "lease_24": 11.99, "buy_24": 16.62, "lease_36": null, "buy_36": 11.08},
+  {"category": "Apple Watch", "variant": "Ultra 3 Titan. 49mm (Cel)", "mrp": 799.0, "lease_12": 36.0, "buy_12": 66.58, "lease_24": 25.0, "buy_24": 33.29, "lease_36": null, "buy_36": 22.19}
+]
