@@ -1,0 +1,26 @@
+name: Update Daily Exchange Rates
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+  workflow_dispatch: # Allows manual trigger anytime
+
+jobs:
+  update-rates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Fetch Live Currency Rates
+        run: |
+          echo "Updating live rates from API..."
+          curl -s https://api.exchangerate-api.com/v4/latest/USD > rates.json
+
+      - name: Commit & Push updates
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add rates.json
+          git diff-index --quiet HEAD || git commit -m "Auto-update currency rates"
+          git push
