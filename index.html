@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Lease vs. Buy Decision Engine</title>
+  
+  <!-- Chart.js CDN for interactive financial graphs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 32px 24px;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Fixed Header Flex Layout */
+    .header-card {
+      background-color: #ffffff;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+
+    .header-subtitle {
+      color: #64748b;
+      font-size: 15px;
+      margin: 8px 0 0 0;
+    }
+
+    .developer-badge {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Cards */
+    .card {
+      background-color: #ffffff;
+      padding: 24px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* Form & Controls Grid */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+
+    select {
+      width: 100%;
+      background-color: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #0f172a;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Strategy Box */
+    .strategy-box {
+      margin-top: 20px;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: center;
+    }
+
+    .toggle-group {
+      display: flex;
+      background-color: #e2e8f0;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+      color: #475569;
+      transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+      background-color: #ffffff;
+      color: #1d4ed8;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    /* Slider */
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .badge-pill {
+      font-size: 12px;
+      font-weight: 800;
+      color: #1d4ed8;
+      background-color: #dbeafe;
+      border: 1px solid #bfdbfe;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: #2563eb;
+      cursor: pointer;
+    }
+
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .summary-card {
+      padding: 20px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      background-color: #ffffff;
+    }
+
+    .summary-card.lease {
+      background-color: #f0f9ff;
+      border-color: #bae6fd;
+    }
+
+    .summary-card.buy {
+      background-color: #ecfdf5;
+      border-color: #a7f3d0;
+    }
+
+    .card-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .status-available { background-color: #dbeafe; color: #1e40af; }
+    .status-0apr { background-color: #d1fae5; color: #065f46; }
+
+    .price-large {
+      font-size: 26px;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
+    .net-cost {
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .detail-text {
+      font-size: 11px;
+      margin-top: 2px;
+      opacity: 0.85;
+    }
+
+    /* Chart Area */
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 320px;
+      width: 100%;
+    }
+
+    .note-box {
+      font-size: 12px;
+      color: #475569;
+      background-color: #f8fafc;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #f1f5f9;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 640px) {
+      .header-card {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Top Header & Developer Badge -->
+    <header class="header-card">
+      <div>
+        <h1 class="header-title">Apple Lease vs. Buy Decision Engine</h1>
+        <p class="header-subtitle">Compare cash flow, lease buyout options, and net cost of ownership across Apple products globally.</p>
+      </div>
+      <div class="developer-badge">
+        Developed by Surya Sripati
+      </div>
+    </header>
+
+    <!-- Selection Controls Card -->
+    <div class="card">
+      <div class="controls-grid">
+        <!-- Expanded Region Selector -->
+        <div class="field-group">
+          <label>Select Region</label>
+          <select id="countrySelect">
+            <option value="US" selected>🇺🇸 United States (USD)</option>
+            <option value="UK">🇬🇧 United Kingdom (GBP)</option>
+            <option value="CA">🇨🇦 Canada (CAD)</option>
+            <option value="DE">🇩🇪 Germany (EUR)</option>
+            <option value="JP">🇯🇵 Japan (JPY)</option>
+            <option value="CN">🇨🇳 China (CNY)</option>
+            <option value="IN">🇮🇳 India (INR)</option>
+            <option value="AU">🇦🇺 Australia (AUD)</option>
+            <option value="NZ">🇳🇿 New Zealand (NZD)</option>
+            <option value="SG">🇸🇬 Singapore (SGD)</option>
+            <option value="HK">🇭🇰 Hong Kong (HKD)</option>
+            <option value="KR">🇰🇷 South Korea (KRW)</option>
+            <option value="UAE">🇦🇪 United Arab Emirates (AED)</option>
+            <option value="CH">🇨🇭 Switzerland (CHF)</option>
+            <option value="MX">🇲🇽 Mexico (MXN)</option>
+            <option value="BR">🇧🇷 Brazil (BRL)</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label>1. Product Category</label>
+          <select id="categorySelect"></select>
+        </div>
+        <div class="field-group">
+          <label>2. Product Variant</label>
+          <select id="variantSelect"></select>
+        </div>
+        <div class="field-group">
+          <label>3. Term Duration</label>
+          <select id="termSelect">
+            <option value="12">12 Months</option>
+            <option value="24" selected>24 Months</option>
+            <option value="36">36 Months</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- End of Term Strategy -->
+      <div class="strategy-box">
+        <div class="field-group">
+          <label>End of Term Strategy</label>
+          <div class="toggle-group">
+            <button id="btnReturn" class="toggle-btn active">Return / Upgrade Lease</button>
+            <button id="btnBuyout" class="toggle-btn">Buyout Lease & Keep Device</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="slider-header">
+            <label>Est. Resale / Buyout Value</label>
+            <span id="resalePctDisplay" class="badge-pill">35% of MRP</span>
+          </div>
+          <div style="background:#fff; padding:6px 10px; border-radius:8px; border:1px solid #cbd5e1;">
+            <input id="resaleRange" type="range" min="10" max="70" step="5" value="35">
+          </div>
+          <span style="font-size:11px; color:#64748b; margin-top:4px; display:block;">Determines lease buyout cost OR resale/trade-in value if bought outright.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <span class="card-title" style="color:#94a3b8;">Est. Retail Price (MRP)</span>
+        <div id="mrpDisplay" class="price-large" style="color:#0f172a;">$0.00</div>
+      </div>
+
+      <div class="summary-card lease">
+        <div class="card-label-row">
+          <span class="card-title" style="color:#2563eb;">Apple Upgrade Lease</span>
+          <span id="leaseStatus" class="status-badge status-available">Available</span>
+        </div>
+        <div id="leaseMonthly" class="price-large" style="color:#1e3a8a;">$0.00 / mo</div>
+        <div id="leaseNetCost" class="net-cost" style="color:#1d4ed8;">Net Cost: $0.00</div>
+        <div id="leaseDetail" class="detail-text" style="color:#2563eb;">Outflow: $0.00</div>
+      </div>
+
+      <div class="summary-card buy">
+        <div class="card-label-row">
+          <span class="card-title" style="color:#059669;">Apple Card / 0% Buy</span>
+          <span class="status-badge status-0apr">0% APR</span>
+        </div>
+        <div id="buyMonthly" class="price-large" style="color:#064e3b;">$0.00 / mo</div>
+        <div id="buyNetCost" class="net-cost" style="color:#047857;">Net Cost: $0.00</div>
+        <div id="buyDetail" class="detail-text" style="color:#059669;">Outflow: $0.00 | Resale: -$0.00</div>
+      </div>
+    </div>
+
+    <!-- Chart Dashboard -->
+    <div class="card">
+      <div class="chart-header">
+        <h2 style="font-size:18px; font-weight:800; margin:0;">Financial Comparison</h2>
+        <span id="strategyBadge" style="font-size:12px; font-weight:600; padding:4px 10px; border-radius:9999px; background:#f1f5f9; color:#475569;">Strategy: Return Lease</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="cashflowChart"></canvas>
+      </div>
+      <div id="summaryNote" class="note-box"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Expanded Region & Currency Configuration Map
+    const countryConfigs = {
+      US: { currency: "USD", locale: "en-US", rate: 1.0 },
+      UK: { currency: "GBP", locale: "en-GB", rate: 0.79 },
+      CA: { currency: "CAD", locale: "en-CA", rate: 1.36 },
+      DE: { currency: "EUR", locale: "de-DE", rate: 0.87 },
+      JP: { currency: "JPY", locale: "ja-JP", rate: 155.0 },
+      CN: { currency: "CNY", locale: "zh-CN", rate: 7.23 },
+      IN: { currency: "INR", locale: "en-IN", rate: 95.6 },
+      AU: { currency: "AUD", locale: "en-AU", rate: 1.52 },
+      NZ: { currency: "NZD", locale: "en-NZ", rate: 1.65 },
+      SG: { currency: "SGD", locale: "en-SG", rate: 1.35 },
+      HK: { currency: "HKD", locale: "zh-HK", rate: 7.82 },
+      KR: { currency: "KRW", locale: "ko-KR", rate: 1375.0 },
+      UAE: { currency: "AED", locale: "ar-AE", rate: 3.67 },
+      CH: { currency: "CHF", locale: "de-CH", rate: 0.91 },
+      MX: { currency: "MXN", locale: "es-MX", rate: 16.8 },
+      BR: { currency: "BRL", locale: "pt-BR", rate: 5.15 }
+    };
+
+    // State Variables
+    let currentCountry = "US";
+    let productData = [];
+    let isBuyoutMode = false;
+    let chart = null;
+
+    // UI Elements
+    const countrySelect = document.getElementById("countrySelect");
+    const categorySelect = document.getElementById("categorySelect");
+    const variantSelect = document.getElementById("variantSelect");
+    const termSelect = document.getElementById("termSelect");
+    const mrpDisplay = document.getElementById("mrpDisplay");
+    const leaseMonthly = document.getElementById("leaseMonthly");
+    const leaseNetCost = document.getElementById("leaseNetCost");
+    const leaseDetail = document.getElementById("leaseDetail");
+    const leaseStatus = document.getElementById("leaseStatus");
+    const buyMonthly = document.getElementById("buyMonthly");
+    const buyNetCost = document.getElementById("buyNetCost");
+    const buyDetail = document.getElementById("buyDetail");
+    const summaryNote = document.getElementById("summaryNote");
+    const btnReturn = document.getElementById("btnReturn");
+    const btnBuyout = document.getElementById("btnBuyout");
+    const resaleRange = document.getElementById("resaleRange");
+    const resalePctDisplay = document.getElementById("resalePctDisplay");
+    const strategyBadge = document.getElementById("strategyBadge");
+
+    // Dynamic Currency Formatter
+    function formatCurrency(val) {
+      if (val === null || val === undefined) return 'N/A';
+      const cfg = countryConfigs[currentCountry];
+      return new Intl.NumberFormat(cfg.locale, {
+        style: 'currency',
+        currency: cfg.currency,
+        maximumFractionDigits: (cfg.currency === 'JPY' || cfg.currency === 'KRW') ? 0 : 2
+      }).format(val * cfg.rate);
+    }
+
+    async function init() {
+      // Event Listeners
+      countrySelect.addEventListener("change", (e) => {
+        currentCountry = e.target.value;
+        updateDashboard();
+      });
+
+      categorySelect.addEventListener("change", populateVariants);
+      variantSelect.addEventListener("change", updateDashboard);
+      
+      termSelect.addEventListener("change", () => {
+        const t = parseInt(termSelect.value);
+        if (t === 12) resaleRange.value = 50;
+        else if (t === 24) resaleRange.value = 35;
+        else if (t === 36) resaleRange.value = 20;
+        updateDashboard();
+      });
+
+      resaleRange.addEventListener("input", updateDashboard);
+      btnReturn.addEventListener("click", () => setBuyoutMode(false));
+      btnBuyout.addEventListener("click", () => setBuyoutMode(true));
+
+      // Fetch dynamic price data
+      await loadPricingData();
+    }
+
+    async function loadPricingData() {
+      try {
+        const res = await fetch('./products.json');
+        if (!res.ok) throw new Error("JSON load error");
+        productData = await res.json();
+      } catch (err) {
+        console.warn("Falling back to local dataset:", err);
+        productData = [
+          {"category": "iPhone", "variant": "iPhone 17 Pro (256GB)", "mrp": 1099.0, "lease_12": 45.99, "buy_12": 91.58, "lease_24": 31.99, "buy_24": 45.79, "lease_36": null, "buy_36": 30.53},
+          {"category": "iPhone", "variant": "iPhone 17 (256GB)", "mrp": 799.0, "lease_12": 32.99, "buy_12": 66.58, "lease_24": 22.99, "buy_24": 33.29, "lease_36": null, "buy_36": 22.19},
+          {"category": "Mac", "variant": "MacBook Pro (512GB Base)", "mrp": 1599.0, "lease_12": null, "buy_12": 133.25, "lease_24": 49.99, "buy_24": 66.62, "lease_36": 39.99, "buy_36": 44.42},
+          {"category": "iPad", "variant": "iPad Pro 11\" (256GB Base)", "mrp": 999.0, "lease_12": null, "buy_12": 83.25, "lease_24": 35.0, "buy_24": 41.62, "lease_36": 24.99, "buy_36": 27.75}
+        ];
+      }
+      
+      populateCategories();
+    }
+
+    function populateCategories() {
+      const categories = [...new Set(productData.map(d => d.category))];
+      categorySelect.innerHTML = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+      populateVariants();
+    }
+
+    function populateVariants() {
+      const cat = categorySelect.value;
+      const filtered = productData.filter(d => d.category === cat);
+      variantSelect.innerHTML = filtered.map(v => `<option value="${v.variant}">${v.variant}</option>`).join('');
+      updateDashboard();
+    }
+
+    function setBuyoutMode(buyout) {
+      isBuyoutMode = buyout;
+      if (isBuyoutMode) {
+        btnBuyout.classList.add("active");
+        btnReturn.classList.remove("active");
+        strategyBadge.innerText = "Strategy: Buyout Lease";
+      } else {
+        btnReturn.classList.add("active");
+        btnBuyout.classList.remove("active");
+        strategyBadge.innerText = "Strategy: Return Lease";
+      }
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      const variantName = variantSelect.value;
+      const term = parseInt(termSelect.value);
+      const item = productData.find(d => d.variant === variantName);
+      if (!item) return;
+
+      const rate = countryConfigs[currentCountry].rate;
+      const leasePrice = item[`lease_${term}`];
+      const buyPrice = item[`buy_${term}`];
+      const resalePct = parseInt(resaleRange.value) / 100;
+      const resaleVal = item.mrp * resalePct;
+
+      resalePctDisplay.innerText = `${resaleRange.value}% of MRP (${formatCurrency(resaleVal)})`;
+      mrpDisplay.innerText = formatCurrency(item.mrp);
+
+      // Buy Calculations
+      let totalBuyOutflow = buyPrice ? buyPrice * term : 0;
+      let buyNet = totalBuyOutflow - resaleVal;
+
+      if (buyPrice !== null) {
+        buyMonthly.innerText = `${formatCurrency(buyPrice)} / mo`;
+        buyNetCost.innerText = `Net Ownership Cost: ${formatCurrency(buyNet)}`;
+        buyDetail.innerText = `Total Outflow: ${formatCurrency(totalBuyOutflow)} | Est. Resale: -${formatCurrency(resaleVal)}`;
+      } else {
+        buyMonthly.innerText = 'N/A';
+        buyNetCost.innerText = 'N/A';
+        buyDetail.innerText = 'Option Excluded';
+      }
+
+      // Lease Calculations
+      let totalLeaseOutflow = leasePrice ? leasePrice * term : 0;
+      let leaseNet = isBuyoutMode ? (totalLeaseOutflow + resaleVal) : totalLeaseOutflow;
+
+      if (leasePrice !== null) {
+        leaseMonthly.innerText = `${formatCurrency(leasePrice)} / mo`;
+        leaseNetCost.innerText = `Net Ownership Cost: ${formatCurrency(leaseNet)}`;
+        leaseDetail.innerText = isBuyoutMode 
+          ? `Outflow: ${formatCurrency(totalLeaseOutflow)} + Buyout: ${formatCurrency(resaleVal)}`
+          : `Outflow: ${formatCurrency(totalLeaseOutflow)} (Returned)`;
+        
+        leaseStatus.innerText = "Available";
+        leaseStatus.className = "status-badge status-available";
+      } else {
+        leaseMonthly.innerText = 'N/A';
+        leaseNetCost.innerText = 'N/A';
+        leaseDetail.innerText = 'Term Excluded';
+        leaseStatus.innerText = "Unavailable";
+        leaseStatus.className = "status-badge";
+        leaseStatus.style.backgroundColor = "#e2e8f0";
+        leaseStatus.style.color = "#64748b";
+      }
+
+      renderChart(item, term, leasePrice, buyPrice, resaleVal, rate);
+    }
+
+    function renderChart(item, months, leaseMonthlyVal, buyMonthlyVal, resaleVal, rate) {
+      const labels = Array.from({length: months + 1}, (_, i) => i === 0 ? 'Start' : `Mo ${i}`);
+      
+      let leaseData = [0];
+      let buyData = [0];
+
+      for (let i = 1; i <= months; i++) {
+        leaseData.push(leaseMonthlyVal ? leaseMonthlyVal * i * rate : null);
+        buyData.push(buyMonthlyVal ? buyMonthlyVal * i * rate : null);
+      }
+
+      if (isBuyoutMode && leaseMonthlyVal) {
+        leaseData[months] += (resaleVal * rate);
+      }
+      if (buyMonthlyVal) {
+        buyData[months] -= (resaleVal * rate);
+      }
+
+      if (chart) chart.destroy();
+
+      const ctx = document.getElementById("cashflowChart").getContext("2d");
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: isBuyoutMode ? 'Lease + Buyout Option' : 'Upgrade Lease Outflow',
+              data: leaseData,
+              borderColor: '#2563eb',
+              backgroundColor: 'rgba(37, 99, 235, 0.1)',
+              borderDash: isBuyoutMode ? [5, 5] : [],
+              fill: false,
+              tension: 0.1
+            },
+            {
+              label: '0% APR Buy (Net of Resale)',
+              data: buyData,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              fill: false,
+              tension: 0.1
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.raw / rate)}`
+              }
+            }
+          },
+          scales: {
+            y: {
+              ticks: { callback: (val) => formatCurrency(val / rate) }
+            }
+          }
+        }
+      });
+
+      if (leaseMonthlyVal && buyMonthlyVal) {
+        const leaseOutflow = leaseMonthlyVal * months;
+        const buyNet = (buyMonthlyVal * months) - resaleVal;
+        const leaseNet = isBuyoutMode ? (leaseOutflow + resaleVal) : leaseOutflow;
+
+        if (!isBuyoutMode) {
+          summaryNote.innerHTML = `
+            <p>💡 <b>Return Strategy:</b> Leasing saves <b>${formatCurrency(buyMonthlyVal * months - leaseOutflow)}</b> in cash outlay over ${months} months compared to financing (${formatCurrency(leaseMonthlyVal)}/mo vs ${formatCurrency(buyMonthlyVal)}/mo).</p>
+            <p style="color:#64748b; margin-top:4px;">If you sell the financed device at ${formatCurrency(resaleVal)} (${resaleRange.value}% residual), buying achieves a net cost of <b>${formatCurrency(buyNet)}</b> vs <b>${formatCurrency(leaseOutflow)}</b> on lease.</p>
+          `;
+        } else {
+          summaryNote.innerHTML = `
+            <p>💡 <b>Buyout Strategy:</b> Exercising the buyout at lease end for estimated residual value (${formatCurrency(resaleVal)}) brings total cost to <b>${formatCurrency(leaseNet)}</b> compared to 0% financing net cost of <b>${formatCurrency(buyNet)}</b>.</p>
+          `;
+        }
+      } else {
+        summaryNote.innerHTML = `<p>💡 Selected term option is excluded for this device category.</p>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
